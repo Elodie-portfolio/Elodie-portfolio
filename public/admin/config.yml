@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: massa974/foliobase  # Remplacez par votre repository GitHub réel
+  repo: Elodie-portfolio/Elodie-portfolio  # Remplacez par votre repository GitHub réel
   branch: dev
   base_url: https://foliobase.netlify.app  # URL de votre site
   auth_endpoint: /.netlify/functions/auth  # Notre fonction d'authentification
@@ -12,8 +12,8 @@ site_url: https://foliobase.netlify.app
 media_library:
   name: cloudinary
   config:
-    cloud_name: dtnbb9ykw  # À remplacer par le nom de votre compte Cloudinary
-    api_key: 116398255276922        # À remplacer par votre clé API Cloudinary
+    cloud_name: dsyv9wa6b  # À remplacer par le nom de votre compte Cloudinary
+    api_key: 431148776185398        # À remplacer par votre clé API Cloudinary
     multiple: true
 
 # Dossier de stockage des médias dans le repository (fallback pour PDF > 20MB)
