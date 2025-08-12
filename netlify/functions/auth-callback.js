@@ -42,40 +42,67 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Script pour envoyer le token au CMS avec le protocole Decap CMS 2024
+    // Script pour envoyer le token au CMS - Protocole Decap CMS 2024
     const script = `
       <script>
         (function() {
-          function receiveMessage(e) {
-            console.log("receiveMessage %o", e);
-            
-            // Répondre au CMS avec le token
-            if (e.data === "authorizing:github" && e.origin === "${process.env.URL}") {
-              const authData = {
-                token: "${tokenData.access_token}",
-                provider: "github"
-              };
+          const authData = {
+            token: "${tokenData.access_token}",
+            provider: "github"
+          };
+          
+          console.log("Auth callback ready with token:", authData.token.substring(0, 8) + "...");
+          
+          function sendAuthData() {
+            if (window.opener) {
+              console.log("Sending authorization data to parent window");
               
-              console.log("Sending auth data to CMS:", authData);
-              e.source.postMessage(
+              // Protocole exact Decap CMS
+              window.opener.postMessage(
                 "authorization:github:success:" + JSON.stringify(authData),
-                e.origin
+                "${process.env.URL}"
               );
               
-              // Auto-fermeture avec timeout de sécurité
+              console.log("Auth data sent successfully");
+              
+              // Fermer la popup après succès
               setTimeout(() => {
+                console.log("Closing auth popup");
                 window.close();
               }, 1000);
+            } else {
+              console.error("No opener window found");
+            }
+          }
+          
+          // Écouter les messages du CMS parent
+          function receiveMessage(e) {
+            console.log("Received message:", e.data, "from origin:", e.origin);
+            
+            if (e.origin === "${process.env.URL}") {
+              if (e.data === "authorizing:github") {
+                console.log("CMS requesting authorization");
+                sendAuthData();
+              }
             }
           }
           
           window.addEventListener("message", receiveMessage, false);
           
-          // Message d'initialisation pour informer que la fenêtre est prête
-          console.log("Posting authorizing message to %o", "${process.env.URL}");
+          // Envoyer immédiatement si la fenêtre parent existe
           if (window.opener) {
+            console.log("Notifying parent window of authorization readiness");
             window.opener.postMessage("authorizing:github", "${process.env.URL}");
+            
+            // Envoyer aussi directement le token après un court délai
+            setTimeout(sendAuthData, 500);
           }
+          
+          // Fallback : fermer automatiquement après 10 secondes
+          setTimeout(() => {
+            console.log("Auto-closing auth window (timeout)");
+            window.close();
+          }, 10000);
         })();
       </script>
     `;
