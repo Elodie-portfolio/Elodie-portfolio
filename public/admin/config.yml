@@ -1,12 +1,12 @@
 backend:
   name: github
-  repo: Elodie-portfolio/Elodie-portfolio  # Remplacez par votre repository GitHub réel
+  repo: Elodie-portfolio/Elodie-Portfolio
   branch: dev
-  base_url: https://foliobase.netlify.app  # URL de votre site
-  auth_endpoint: /.netlify/functions/auth  # Notre fonction d'authentification
+  base_url: https://clever-paprenjak-4af7b3.netlify.app
+  auth_endpoint: /.netlify/functions/auth
 
 # URL du site pour afficher un lien dans la navbar du CMS
-site_url: https://foliobase.netlify.app
+site_url: https://clever-paprenjak-4af7b3.netlify.app
 
 # Configuration du stockage des médias avec Cloudinary
 media_library:

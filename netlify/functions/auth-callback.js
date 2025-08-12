@@ -42,29 +42,40 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Script pour envoyer le token au CMS
+    // Script pour envoyer le token au CMS avec le protocole Decap CMS 2024
     const script = `
       <script>
         (function() {
           function receiveMessage(e) {
             console.log("receiveMessage %o", e);
-            if (e.origin !== "${process.env.URL}") {
-              console.log("Invalid origin: %o", e.origin);
-              return;
+            
+            // Répondre au CMS avec le token
+            if (e.data === "authorizing:github" && e.origin === "${process.env.URL}") {
+              const authData = {
+                token: "${tokenData.access_token}",
+                provider: "github"
+              };
+              
+              console.log("Sending auth data to CMS:", authData);
+              e.source.postMessage(
+                "authorization:github:success:" + JSON.stringify(authData),
+                e.origin
+              );
+              
+              // Auto-fermeture avec timeout de sécurité
+              setTimeout(() => {
+                window.close();
+              }, 1000);
             }
-            // Envoyer le token au CMS
-            e.source.postMessage(
-              'authorization:github:success:${JSON.stringify({
-                token: tokenData.access_token,
-                provider: 'github'
-              })}',
-              e.origin
-            );
           }
+          
           window.addEventListener("message", receiveMessage, false);
-          // Informer que la fenêtre est prête
-          console.log("Posting message to %o", "${process.env.URL}");
-          window.opener && window.opener.postMessage("authorizing:github", "${process.env.URL}");
+          
+          // Message d'initialisation pour informer que la fenêtre est prête
+          console.log("Posting authorizing message to %o", "${process.env.URL}");
+          if (window.opener) {
+            window.opener.postMessage("authorizing:github", "${process.env.URL}");
+          }
         })();
       </script>
     `;

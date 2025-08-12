@@ -7,7 +7,7 @@
 
 # Configuration pour les redirects
 [[redirects]]
-  from = "/admin/*"
+  from = "/admin"
   to = "/admin/index.html"
   status = 200
 
